@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+  <body>
+    <h1> Liam's Song Database </h1><br>
+
+    <form method="get" action="{{ search_page }}" />
+      <fieldset style="width: 50%">
+      <legend> Search by: </legend>
+      <input type="radio" name="searchby" value="artist" checked /> Artist
+      <input type="radio" name="searchby" value="song" /> Song
+      <br> <br>
+      <input type="text" name="query" />
+      <input type="submit" value="Search" />
+      </fieldset>
+    </form>
+    
+    <h2> Liam's Top Songs: <h2>
+
+    <h3> Walk This Way - Aerosmith <h3>
+    <h4> (3:42) </h4>
+    <br>
+
+    <h3> High Hopes - Kodaline </h3>
+    <h4> (3:50)  </h4>
+    <br>
+
+    <h3> Say What You Want - Texas </h3>
+    <h4> (3:51) </h4>
+  </body>
+</html>
