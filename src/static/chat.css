@@ -1,0 +1,17 @@
+h3{
+  border-style: solid;
+  border-width: 1px;
+  border-color: gray;
+  margin-left: 0.5em;
+  margin-top: 0.25em;
+  display: inline;
+}
+
+*{
+  font-family: sans-serif;
+}
+
+div{
+  border: 1px solid gray;
+  width: 50%;
+}

@@ -1,53 +1,52 @@
-from flask import Flask, redirect, url_for, request, render_template
+from flask import Flask, redirect, url_for, render_template, request, session
 import sqlite3 as lite
 app = Flask(__name__)
 
-#If user loads '/' then redirect to '/home'
-@app.route("/")
-def redirHome():
-  return redirect(url_for('loadHome'))
+app.secret_key = '/x9c/x11/xf2/xe0/xc6/xdb/x0f/x10/xf4/x89/xca/x02/x9eS/x83/x1c/x95/x12/xb1/x9a[`/x93/xb0'
 
-#Load the home page
-@app.route("/home")
-def loadHome():
-  #return the template for the home page
-  return render_template('home.html', search_page=url_for('loadResults'))
+@app.route('/')
+def redirLogin():
+    return redirect(url_for('loadWelcome'))
 
-#load search results page
-@app.route("/results")
-def loadResults():
-  #name and search method pulled from the URL
-  name = request.args.get('query', '')
-  search_method = request.args.get('searchby', '')
+@app.route('/welcome')
+def loadWelcome():
+    return render_template('welcome.html')
 
-  #connect to the database
-  con = lite.connect('music.db')
+@app.route('/chat', methods=['POST', 'GET'])
+def loadChat():
 
-  cur = con.cursor()
+  session['name'] = request.args.get('user_id', '')
 
-  #if the user chooses to search by artist, query database for artist matches
-  if search_method == 'artist':
-     cur.execute("SELECT * FROM Song WHERE artist_name LIKE :name", {"name":
-     '%'+name+'%'})
+  if request.method == 'GET':
+    user_id = request.args.get('user_id', '')
+    con = lite.connect('messages.db')
 
-     #Pull results into a python dictionary - used to loop with templates to
-     #display multiple results
-     Song=[dict(name=row[1], artist_name=row[2], length=row[3]) for row in
-     cur.fetchall()]
+    c = con.cursor()
 
-     return render_template('results.html', Song = Song)
+    c.execute("SELECT * FROM messages")
+    Messages = [dict(user_id=row[0], message_text=row[1]) for row in
+    c.fetchall()]
 
+    con.close()
+
+    return render_template('chat.html', Messages = Messages)
   else:
-     #else, user chooses to search by song name so query databse for song
-     #matches instead
-     cur.execute("SELECT * FROM Song WHERE name LIKE :name",
-     {"name":'%'+name+'%'})
+    user_id = request.args.get('user_id', '')
+    message = request.form['message']
+    con = lite.connect('messages.db')
 
-     #Again with artist search method, pull results into a python dictionary
-     #to display multiple results
-     Song=[dict(name=row[1], artist_name=row[2], length=row[3]) for row in
-     cur.fetchall()]
-     return render_template('results.html', Song = Song)
+    c = con.cursor()
+
+    c.execute("INSERT INTO messages VALUES (?, ?)", (user_id, message))
+    con.commit()
+
+    c.execute("SELECT * FROM messages")
+
+    Messages = [dict(user_id=row[0], message_text=row[1]) for row in
+    c.fetchall()]
+    con.close()
+
+    return render_template('chat.html', Messages = Messages)
 
 if __name__ == "__main__":
   app.run(host='0.0.0.0', debug=True)
